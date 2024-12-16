@@ -21,6 +21,7 @@ const orderSchema = new mongoose.Schema({
         phone: { type: Number, required: true },
     },
     paymentMethod: { type: String, required: true },
+    shippingMethod: { type: String, required: true },
     itemsPrice: { type: Number, required: true },
     ShippingPrice: { type: Number, required: true },
     totalPrice: { type: Number, required: true },
