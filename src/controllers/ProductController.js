@@ -84,10 +84,23 @@ const getAllProduct = async (req, res) => {
         })
     }
 }
+
+const getAllTypeProduct = async (req, res) => {
+    try {
+        const response = await ProductService.getAllTypeProduct()
+        return res.status(200).json(response)
+    } catch (e) {
+        return res.status(404).json({
+            message: e
+        })
+    }
+}
+
 module.exports = {
     createProduct,
     updateProduct,
     getDetailsProduct,
     deleteProduct,
-    getAllProduct
+    getAllProduct,
+    getAllTypeProduct
 }

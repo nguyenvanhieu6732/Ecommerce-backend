@@ -3,7 +3,7 @@ const Product = require("../models/ProductModel")
 
 const createOrder = (newOrder) => {
     return new Promise(async (resolve, reject) => {
-        const { orderItems, paymentMethod, shippingMethod, itemsPrice, ShippingPrice, totalPrice, fullName, address, city, phone, user } = newOrder
+        const { orderItems, paymentMethod, shippingMethod, itemsPrice, ShippingPrice, totalPrice, fullName, address, city, phone, user, isPaid } = newOrder
         try {
             const promises = orderItems.map(async (order) => {
                 const productData = await Product.findOneAndUpdate({
@@ -16,27 +16,9 @@ const createOrder = (newOrder) => {
                     { new: true }
                 )
                 if (productData) {
-                    const createdOrder = await Order.create({
-                        orderItems,
-                        shippingAddress: {
-                            fullName,
-                            address,
-                            city,
-                            phone
-                        },
-                        paymentMethod,
-                        shippingMethod,
-                        itemsPrice,
-                        ShippingPrice,
-                        totalPrice,
-                        user: user
-                    })
-                    console.log("createdOrder", createdOrder)
-                    if (createdOrder) {
-                        return {
-                            status: 'OK',
-                            message: 'SUCCESS',
-                        }
+                    return {
+                        status: 'OK',
+                        message: 'SUCCESS',
                     }
                 } else {
                     return {
@@ -49,10 +31,37 @@ const createOrder = (newOrder) => {
             const result = await Promise.all(promises)
             const newData = result && result.filter((item) => item.id)
             if (newData.length) {
+                const arrId = []
+                newData.forEach((item) => {
+                    newData.push(item.id)
+                })
                 resolve({
                     status: "ERR",
-                    message: `San pham voi id ${newData.join(", ")} khong du hang`
+                    message: `San pham voi id ${arrId.join(", ")} khong du hang`
                 })
+            } else {
+                const createdOrder = await Order.create({
+                    orderItems,
+                    shippingAddress: {
+                        fullName,
+                        address,
+                        city,
+                        phone
+                    },
+                    paymentMethod,
+                    shippingMethod,
+                    itemsPrice,
+                    ShippingPrice,
+                    totalPrice,
+                    user: user,
+                    isPaid
+                })
+                if (createOrder) {
+                    resolve({
+                        status: 'OK',
+                        message: 'ERR',
+                    })
+                }
             }
             resolve({
                 status: "OK",
@@ -160,10 +169,25 @@ const cancelOrderDetails = (id, data) => {
         }
     })
 }
+const getAllOrderUser = () => {
+    return new Promise(async (resolve, reject) => {
+        try {
+            const allOrderUser = await Order.find()
+            resolve({
+                status: 'OK',
+                message: 'Success',
+                data: allOrderUser
+            })
+        } catch (e) {
+            reject(e)
+        }
+    })
+}
 
 module.exports = {
     createOrder,
     getAllOrderDetails,
     getOrderDetails,
-    cancelOrderDetails
+    cancelOrderDetails,
+    getAllOrderUser
 }
