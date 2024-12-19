@@ -2,8 +2,8 @@ const OrderService = require("../services/OrderService")
 
 const createOrder = async (req, res) => {
     try {
-        const { paymentMethod, shippingMethod, itemsPrice,  ShippingPrice, totalPrice, fullName, address, city, phone } = req.body
-        if (!paymentMethod || !shippingMethod || !itemsPrice || !ShippingPrice || !totalPrice || !fullName || !address || !city || !phone) {
+        const { paymentMethod, shippingMethod, itemsPrice,  ShippingPrice, totalPrice, fullName, address, city, phone, orderCode } = req.body
+        if (!paymentMethod || !orderCode|| !shippingMethod || !itemsPrice || !ShippingPrice || !totalPrice || !fullName || !address || !city || !phone) {
             return res.status(200).json({
                 status: "ERR",
                 message: "The input in required"

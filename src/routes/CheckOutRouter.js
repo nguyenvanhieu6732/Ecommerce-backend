@@ -8,22 +8,16 @@ router.post('/create_payment_url', function (req, res, next) {
         req.socket.remoteAddress ||
         req.connection.socket.remoteAddress;
 
-    var env = {
-        vnp_TmnCode: "WNXF53ET",
-        vnp_HashSecret: "SVE5NMOWSBFBA3JH7M8ZQCR0L0QZMEZN",
-        vnp_Url: "https://sandbox.vnpayment.vn/paymentv2/vpcpay.html",
-        vnp_Api: "https://sandbox.vnpayment.vn/merchant_webapi/api/transaction",
-        vnp_ReturnUrl: "http://localhost:3000/checkout/vnpay_return",
-    };
 
-    var tmnCode = env.vnp_TmnCode;
-    var secretKey = env.vnp_HashSecret
-    var vnpUrl = env.vnp_Url
-    var returnUrl = env.vnp_ReturnUrl
+
+    var tmnCode = process.env.VNP_TMNCODE;
+    var secretKey = process.env.VNP_HASHSECRET;
+    var vnpUrl = process.env.VNP_URL
+    var returnUrl = process.env.VNP_RETURNURL
     let date = new Date();
     let createDate = moment(date).format('YYYYMMDDHHmmss');
     let expireDate = moment(date).add(5, 'minutes').format('YYYYMMDDHHmmss');
-    let orderId = moment(date).format('DDHHmmss');
+    let orderId = "DH" + moment(date).format('YYYYMMDDHHmmss');
     var amount = req.body.amount;
     var bankCode = req.body.bankCode;
 
@@ -111,15 +105,8 @@ router.get('/vnpay_return', function (req, res, next) {
 
     vnp_Params = sortObject(vnp_Params);
 
-    var env = {
-        vnp_TmnCode: "WNXF53ET",
-        vnp_HashSecret: "SVE5NMOWSBFBA3JH7M8ZQCR0L0QZMEZN",
-        vnp_Url: "https://sandbox.vnpayment.vn/paymentv2/vpcpay.html",
-        vnp_Api: "https://sandbox.vnpayment.vn/merchant_webapi/api/transaction",
-        vnp_ReturnUrl: "http://localhost:3000/checkout/vnpay_return",
-    };
-    var tmnCode = env.vnp_TmnCode
-    var secretKey = env.vnp_HashSecret
+
+    var secretKey = process.env.VNP_HASHSECRET;
 
     var querystring = require('qs');
     var signData = querystring.stringify(vnp_Params, { encode: false });
@@ -131,7 +118,7 @@ router.get('/vnpay_return', function (req, res, next) {
     console.log("signed:", signed);
     if (secureHash === signed) {
         // Trả về kết quả thành công
-        res.json({ success: true, responseCode: vnp_Params['vnp_ResponseCode'] });
+        res.json({ success: true, responseCode: vnp_Params['vnp_ResponseCode'], orderCode: vnp_Params['vnp_TxnRef'] });
     } else {
         // Trả về lỗi chữ ký không hợp lệ
         res.json({ success: false, responseCode: '97' });
